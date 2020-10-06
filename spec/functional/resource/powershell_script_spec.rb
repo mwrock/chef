@@ -249,9 +249,9 @@ describe Chef::Resource::WindowsScript::PowershellScript, :windows_only do
     end
   end
 
-  context "when using the :pwsh interpreter", :pwsh_installed do
+  context "when using the pwsh interpreter", :pwsh_installed do
     before do
-      resource.interpreter :pwsh
+      resource.interpreter "pwsh"
     end
 
     it_behaves_like "a running powershell script"
@@ -379,9 +379,9 @@ describe Chef::Resource::WindowsScript::PowershellScript, :windows_only do
 
     context "with powershell_script as the guard_interpreter" do
 
-      context "when :pwsh is the interpreter", :pwsh_installed do
+      context "when pwsh is the interpreter", :pwsh_installed do
         before do
-          resource.interpreter :pwsh
+          resource.interpreter "pwsh"
         end
 
         it "uses powershell core to evaluate the guard" do

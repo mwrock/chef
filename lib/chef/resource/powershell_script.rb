@@ -29,9 +29,10 @@ class Chef
       property :flags, String,
         description: "A string that is passed to the Windows PowerShell command"
 
-      property :interpreter, [:powershell, :pwsh],
-        default: :powershell,
-        description: "the interpreter type, `:powershell` or `:pwsh` (PowerShell Core)"
+      property :interpreter, String,
+        default: "powershell",
+        equal_to: %w{powershell pwsh},
+        description: "The interpreter type, `powershell` or `pwsh` (PowerShell Core)"
 
       property :convert_boolean_return, [true, false],
         default: false,

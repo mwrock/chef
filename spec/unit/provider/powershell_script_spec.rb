@@ -47,8 +47,8 @@ describe Chef::Provider::PowershellScript, "action_run" do
       expect(provider.command).to eq(expected)
     end
 
-    it "uses pwsh when given the :pwsh interpreter" do
-      new_resource.interpreter = :pwsh
+    it "uses pwsh when given the pwsh interpreter" do
+      new_resource.interpreter = "pwsh"
       provider.send(:script_file_path=, "C:\\Temp\\Script.ps1")
 
       expected = <<~CMD.strip
