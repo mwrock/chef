@@ -17,7 +17,7 @@
 #
 
 require "spec_helper"
-require "chef/mixin/powershell_out"
+require "chef/mixin/powershell_exec"
 require "chef/mixin/windows_architecture_helper"
 require "support/shared/integration/integration_helper"
 
@@ -33,7 +33,7 @@ describe Chef::Resource::DscScript, :windows_powershell_dsc_only do
         winrm create winrm/config/Listener?Address=*+Transport=HTTP
       }
     CODE
-    powershell_out!(winrm_code)
+    powershell_exec!(winrm_code)
   end
 
   after(:all) do

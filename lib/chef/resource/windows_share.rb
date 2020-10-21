@@ -126,16 +126,16 @@ class Chef
         share_state_cmd = "Get-SmbShare -Name '#{desired.share_name}' | Select-Object Name,Path, Description, Temporary, CATimeout, ContinuouslyAvailable, ConcurrentUserLimit, EncryptData | ConvertTo-Json -Compress"
 
         Chef::Log.debug("Running '#{share_state_cmd}' to determine share state'")
-        ps_results = powershell_out(share_state_cmd)
+        ps_results = powershell_exec(share_state_cmd)
 
         # detect a failure without raising and then set current_resource to nil
         if ps_results.error?
-          Chef::Log.debug("Error fetching share state: #{ps_results.stderr}")
+          Chef::Log.debug("Error fetching share state: #{ps_results.errors}")
           current_value_does_not_exist!
         end
 
-        Chef::Log.debug("The Get-SmbShare results were #{ps_results.stdout}")
-        results = Chef::JSONCompat.from_json(ps_results.stdout)
+        Chef::Log.debug("The Get-SmbShare results were #{ps_results.result}")
+        results = Chef::JSONCompat.from_json(ps_results.result)
 
         path results["Path"]
         description results["Description"]
@@ -150,15 +150,15 @@ class Chef
         perm_state_cmd = %{Get-SmbShareAccess -Name "#{desired.share_name}" | Select-Object AccountName,AccessControlType,AccessRight | ConvertTo-Json -Compress}
 
         Chef::Log.debug("Running '#{perm_state_cmd}' to determine share permissions state'")
-        ps_perm_results = powershell_out(perm_state_cmd)
+        ps_perm_results = powershell_exec(perm_state_cmd)
 
         # we raise here instead of warning like above because we'd only get here if the above Get-SmbShare
         # command was successful and that continuing would leave us with 1/2 known state
         raise "Could not determine #{desired.share_name} share permissions by running '#{perm_state_cmd}'" if ps_perm_results.error?
 
-        Chef::Log.debug("The Get-SmbShareAccess results were #{ps_perm_results.stdout}")
+        Chef::Log.debug("The Get-SmbShareAccess results were #{ps_perm_results.result}")
 
-        f_users, c_users, r_users = parse_permissions(ps_perm_results.stdout)
+        f_users, c_users, r_users = parse_permissions(ps_perm_results.result)
 
         full_users f_users
         change_users c_users
@@ -246,14 +246,14 @@ class Chef
           delete_command = "Remove-SmbShare -Name '#{new_resource.share_name}' -Force"
 
           Chef::Log.debug("Running '#{delete_command}' to remove the share")
-          powershell_out!(delete_command)
+          powershell_exec!(delete_command)
         end
 
         def update_share
           update_command = "Set-SmbShare -Name '#{new_resource.share_name}' -Description '#{new_resource.description}' -Force"
 
           Chef::Log.debug("Running '#{update_command}' to update the share")
-          powershell_out!(update_command)
+          powershell_exec!(update_command)
         end
 
         def create_share
@@ -264,7 +264,7 @@ class Chef
           share_cmd << " -Temporary:#{bool_string(new_resource.temporary)}" if new_resource.temporary # only set true
 
           Chef::Log.debug("Running '#{share_cmd}' to create the share")
-          powershell_out!(share_cmd)
+          powershell_exec!(share_cmd)
 
           # New-SmbShare adds the "Everyone" user with read access no matter what so we need to remove it
           # before we add our permissions
@@ -299,7 +299,7 @@ class Chef
             grant_command = "Grant-SmbShareAccess -Name '#{new_resource.share_name}' -AccountName \"#{new_resource.send("#{perm_type}_users").join('","')}\" -Force -AccessRight #{perm_type}"
 
             Chef::Log.debug("Running '#{grant_command}' to update the share permissions")
-            powershell_out!(grant_command)
+            powershell_exec!(grant_command)
           end
         end
 
@@ -330,7 +330,7 @@ class Chef
         def revoke_user_permissions(users)
           revoke_command = "Revoke-SmbShareAccess -Name '#{new_resource.share_name}' -AccountName \"#{users.join('","')}\" -Force"
           Chef::Log.debug("Running '#{revoke_command}' to revoke share permissions")
-          powershell_out!(revoke_command)
+          powershell_exec!(revoke_command)
         end
 
         # convert True/False into "$True" & "$False"

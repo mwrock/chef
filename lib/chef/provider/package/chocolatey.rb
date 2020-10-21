@@ -160,9 +160,9 @@ class Chef
 
         # lets us mock out an incorrect value for testing.
         def choco_install_path
-          @choco_install_path ||= powershell_out!(
+          @choco_install_path ||= powershell_exec!(
             PATHFINDING_POWERSHELL_COMMAND
-          ).stdout.chomp
+          ).result.chomp
         end
 
         # Helper to dispatch a choco command through shell_out using the timeout

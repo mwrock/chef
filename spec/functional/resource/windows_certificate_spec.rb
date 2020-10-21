@@ -16,7 +16,7 @@
 #
 
 require "spec_helper"
-require "chef/mixin/powershell_out"
+require "chef/mixin/powershell_exec"
 require "chef/resource/windows_certificate"
 
 module WindowsCertificateHelper
@@ -27,7 +27,7 @@ module WindowsCertificateHelper
     command = <<~EOC
       New-Item -Path #{path}
     EOC
-    powershell_out(command)
+    powershell_exec(command)
   end
 
   def cleanup(store)
@@ -35,7 +35,7 @@ module WindowsCertificateHelper
     command = <<~EOC
       Remove-Item -Path #{path} -Recurse
     EOC
-    powershell_out(command)
+    powershell_exec(command)
   end
 
   def no_of_certificates
@@ -43,7 +43,7 @@ module WindowsCertificateHelper
     command = <<~EOC
       Write-Host (dir #{path} | measure).Count;
     EOC
-    powershell_out(command).stdout.to_i
+    powershell_exec(command).result.to_i
   end
 end
 

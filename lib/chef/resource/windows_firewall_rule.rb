@@ -159,11 +159,11 @@ class Chef
 
       load_current_value do
         load_state_cmd = load_firewall_state(rule_name)
-        output = powershell_out(load_state_cmd)
-        if output.stdout.empty?
+        output = powershell_exec(load_state_cmd)
+        if output.result.empty?
           current_value_does_not_exist!
         else
-          state = Chef::JSONCompat.from_json(output.stdout)
+          state = Chef::JSONCompat.from_json(output.result)
         end
 
         # Need to reverse `$rule.Profile.ToString()` in powershell command
@@ -194,17 +194,17 @@ class Chef
             :remote_port, :direction, :protocol, :icmp_type, :firewall_action, :profile, :program, :service,
             :interface_type, :enabled do
               cmd = firewall_command("Set")
-              powershell_out!(cmd)
+              powershell_exec!(cmd)
             end
           converge_if_changed :group do
-            powershell_out!("Remove-NetFirewallRule -Name '#{new_resource.rule_name}'")
+            powershell_exec!("Remove-NetFirewallRule -Name '#{new_resource.rule_name}'")
             cmd = firewall_command("New")
-            powershell_out!(cmd)
+            powershell_exec!(cmd)
           end
         else
           converge_by("create firewall rule #{new_resource.rule_name}") do
             cmd = firewall_command("New")
-            powershell_out!(cmd)
+            powershell_exec!(cmd)
           end
         end
       end
@@ -214,7 +214,7 @@ class Chef
 
         if current_resource
           converge_by("delete firewall rule #{new_resource.rule_name}") do
-            powershell_out!("Remove-NetFirewallRule -Name '#{new_resource.rule_name}'")
+            powershell_exec!("Remove-NetFirewallRule -Name '#{new_resource.rule_name}'")
           end
         else
           Chef::Log.info("Firewall rule \"#{new_resource.rule_name}\" doesn't exist. Skipping.")

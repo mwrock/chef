@@ -57,11 +57,11 @@ class Chef
 
       load_current_value do
         cmd = load_resource_state_script(source_name)
-        repo = powershell_out!(cmd)
-        if repo.stdout.empty?
+        repo = powershell_exec!(cmd)
+        if repo.result.empty?
           current_value_does_not_exist!
         else
-          status = Chef::JSONCompat.from_json(repo.stdout)
+          status = Chef::JSONCompat.from_json(repo.result)
         end
         url status["url"]
         trusted status["trusted"]
@@ -78,28 +78,28 @@ class Chef
           if package_source_exists?
             converge_if_changed :url, :trusted, :publish_location, :script_source_location, :script_publish_location do
               update_cmd = build_ps_repository_command("Set", new_resource)
-              res = powershell_out(update_cmd)
-              raise "Failed to update #{new_resource.source_name}: #{res.stderr}" unless res.stderr.empty?
+              res = powershell_exec(update_cmd)
+              raise "Failed to update #{new_resource.source_name}: #{res.errors}" unless res.error?
             end
           else
             converge_by("register source: #{new_resource.source_name}") do
               register_cmd = build_ps_repository_command("Register", new_resource)
-              res = powershell_out(register_cmd)
-              raise "Failed to register #{new_resource.source_name}: #{res.stderr}" unless res.stderr.empty?
+              res = powershell_exec(register_cmd)
+              raise "Failed to register #{new_resource.source_name}: #{res.errors}" unless res.error?
             end
           end
         else
           if package_source_exists?
             converge_if_changed :url, :trusted, :provider_name do
               update_cmd = build_package_source_command("Set", new_resource)
-              res = powershell_out(update_cmd)
-              raise "Failed to update #{new_resource.source_name}: #{res.stderr}" unless res.stderr.empty?
+              res = powershell_exec(update_cmd)
+              raise "Failed to update #{new_resource.source_name}: #{res.errors}" unless res.error?
             end
           else
             converge_by("register source: #{new_resource.source_name}") do
               register_cmd = build_package_source_command("Register", new_resource)
-              res = powershell_out(register_cmd)
-              raise "Failed to register #{new_resource.source_name}: #{res.stderr}" unless res.stderr.empty?
+              res = powershell_exec(register_cmd)
+              raise "Failed to register #{new_resource.source_name}: #{res.errors}" unless res.error?
             end
           end
         end
@@ -110,16 +110,16 @@ class Chef
         if package_source_exists?
           unregister_cmd = "Get-PackageSource -Name '#{new_resource.source_name}' | Unregister-PackageSource"
           converge_by("unregister source: #{new_resource.source_name}") do
-            res = powershell_out(unregister_cmd)
-            raise "Failed to unregister #{new_resource.source_name}: #{res.stderr}" unless res.stderr.empty?
+            res = powershell_exec(unregister_cmd)
+            raise "Failed to unregister #{new_resource.source_name}: #{res.errors}" unless res.error?
           end
         end
       end
 
       action_class do
         def package_source_exists?
-          cmd = powershell_out!("(Get-PackageSource -Name '#{new_resource.source_name}' -WarningAction SilentlyContinue).Name")
-          cmd.stdout.downcase.strip == new_resource.source_name.downcase
+          cmd = powershell_exec!("(Get-PackageSource -Name '#{new_resource.source_name}' -WarningAction SilentlyContinue).Name")
+          cmd.result.downcase.strip == new_resource.source_name.downcase
         end
 
         def psrepository_cmdlet_appropriate?
