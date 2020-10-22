@@ -242,9 +242,13 @@ end
 def choco_installed?
   result = ShellHelpers.shell_out("choco --version")
   result.stderr.empty?
+rescue
+  false
 end
 
 def pwsh_installed?
   result = ShellHelpers.shell_out("pwsh.exe --version")
   result.stderr.empty?
+rescue
+  false
 end

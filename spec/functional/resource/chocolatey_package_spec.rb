@@ -22,7 +22,7 @@ describe Chef::Resource::ChocolateyPackage, :windows_only, :choco_installed do
   include Chef::Mixin::PowershellExec
 
   let(:package_name) { "test-A" }
-  let(:package_list) { proc { powershell_exec!("choco list -lo -r #{Array(package_name).join(" ")}").result } }
+  let(:package_list) { proc { powershell_exec!("choco list -lo -r #{Array(package_name).join(" ")}").result.join("\r\n") } }
   let(:package_source) { File.join(CHEF_SPEC_ASSETS, "chocolatey_feed") }
 
   let(:run_context) do
