@@ -207,16 +207,16 @@ class Chef
           when ".der"
             out_file.puts(cert_obj.to_der)
           when ".cer"
-            cert_out = powershell_exec("openssl x509 -text -inform DER -in #{cert_obj.to_pem} -outform CER").result
+            cert_out = shell_out("openssl x509 -text -inform DER -in #{cert_obj.to_pem} -outform CER").stdout
             out_file.puts(cert_out)
           when ".crt"
-            cert_out = powershell_exec("openssl x509 -text -inform DER -in #{cert_obj.to_pem} -outform CRT").result
+            cert_out = shell_out("openssl x509 -text -inform DER -in #{cert_obj.to_pem} -outform CRT").stdout
             out_file.puts(cert_out)
           when ".pfx"
-            cert_out = powershell_exec("openssl pkcs12 -export -nokeys -in #{cert_obj.to_pem} -outform PFX").result
+            cert_out = shell_out("openssl pkcs12 -export -nokeys -in #{cert_obj.to_pem} -outform PFX").stdout
             out_file.puts(cert_out)
           when ".p7b"
-            cert_out = powershell_exec("openssl pkcs7 -export -nokeys -in #{cert_obj.to_pem} -outform P7B").result
+            cert_out = shell_out("openssl pkcs7 -export -nokeys -in #{cert_obj.to_pem} -outform P7B").stdout
             out_file.puts(cert_out)
           else
             Chef::Log.info("Supported certificate format .pem, .der, .cer, .crt, .pfx and .p7b")
@@ -327,7 +327,7 @@ class Chef
         # @return [Boolean] Whether the certificate file is binary encoded or not
         #
         def binary_cert?
-          powershell_exec!("file -b --mime-encoding #{new_resource.source}").result.strip == "binary"
+          shell_out!("file -b --mime-encoding #{new_resource.source}").stdout.strip == "binary"
         end
 
         # Imports the certificate object into cert store

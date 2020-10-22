@@ -19,7 +19,7 @@ require "spec_helper"
 require "chef/mixin/powershell_exec"
 
 describe Chef::Resource::ChocolateyPackage, :windows_only, :choco_installed do
-  include Chef::Mixin::PowershellOut
+  include Chef::Mixin::PowershellExec
 
   let(:package_name) { "test-A" }
   let(:package_list) { proc { powershell_exec!("choco list -lo -r #{Array(package_name).join(" ")}").result.chomp } }

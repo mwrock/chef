@@ -20,7 +20,7 @@ require "chef/mixin/powershell_exec"
 require "chef/resource/windows_certificate"
 
 module WindowsCertificateHelper
-  include Chef::Mixin::PowershellOut
+  include Chef::Mixin::PowershellExec
 
   def create_store(store)
     path = "Cert:\\LocalMachine\\" + store
@@ -40,8 +40,13 @@ module WindowsCertificateHelper
 
   def no_of_certificates
     path = "Cert:\\LocalMachine\\" + store
+    # Seems weird that we have to call sir twice right?
+    # The powershell cert provider seems to cache the last dir
+    # in the same shell. By issuing dir with a different arg (-Force)
+    # that seems to refresh things.
     command = <<~EOC
-      Write-Host (dir #{path} | measure).Count;
+      dir #{path} -Force | Out-Null
+      (dir #{path} | measure).Count
     EOC
     powershell_exec(command).result.to_i
   end

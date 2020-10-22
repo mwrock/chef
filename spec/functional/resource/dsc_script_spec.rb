@@ -23,7 +23,7 @@ require "support/shared/integration/integration_helper"
 
 describe Chef::Resource::DscScript, :windows_powershell_dsc_only do
   include Chef::Mixin::WindowsArchitectureHelper
-  include Chef::Mixin::PowershellOut
+  include Chef::Mixin::PowershellExec
   before(:all) do
     @temp_dir = ::Dir.mktmpdir("dsc-functional-test")
     # enable the HTTP listener if it is not already enabled needed by underlying DSC engine

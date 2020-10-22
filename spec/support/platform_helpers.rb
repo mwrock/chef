@@ -243,10 +243,10 @@ end
 
 def choco_installed?
   result = ShellHelpers.powershell_exec("choco --version")
-  result.error?
+  !result.error?
 end
 
 def pwsh_installed?
   result = ShellHelpers.powershell_exec("pwsh.exe --version")
-  result.error?
+  !result.error?
 end
