@@ -25,7 +25,7 @@ describe Chef::Resource::ChocolateyPackage, :windows_only, :choco_installed do
   let(:package_list) do
     proc do
       ps = powershell_exec!("choco list -lo -r #{Array(package_name).join(" ")}").result
-      ps.kind_of?(Array) ? ps.join("\r\n") : ps
+      ps.is_a?(Array) ? ps.join("\r\n") : ps
     end
   end
   let(:package_source) { File.join(CHEF_SPEC_ASSETS, "chocolatey_feed") }
