@@ -45,38 +45,38 @@ describe Chef::Resource::PowershellPackageSource, :windows_only do
 
   shared_examples "package_source" do
     context "register a package source" do
-        after { remove_package_source }
+      after { remove_package_source }
 
-        it "registers the package source" do
+      it "registers the package source" do
         subject.run_action(:register)
         expect(get_installed_package_source_name).to eq(source_name)
-        end
+      end
 
-        it "does not register the package source if already installed" do
-            subject.run_action(:register)
-            subject.run_action(:register)
-            expect(subject).not_to be_updated_by_last_action
-        end
+      it "does not register the package source if already installed" do
+        subject.run_action(:register)
+        subject.run_action(:register)
+        expect(subject).not_to be_updated_by_last_action
+      end
 
-        it "updates an existing package source if changed" do
-            subject.run_action(:register)
-            subject.trusted !trusted
-            subject.run_action(:register)
-            expect(subject).to be_updated_by_last_action
-        end
+      it "updates an existing package source if changed" do
+        subject.run_action(:register)
+        subject.trusted !trusted
+        subject.run_action(:register)
+        expect(subject).to be_updated_by_last_action
+      end
     end
 
     context "unregister a package source" do
-        it "unregisters the package source" do
-            subject.run_action(:register)
-            subject.run_action(:unregister)
-            expect(get_installed_package_source_name).to be_empty
-        end
+      it "unregisters the package source" do
+        subject.run_action(:register)
+        subject.run_action(:unregister)
+        expect(get_installed_package_source_name).to be_empty
+      end
 
-        it "does not unregister the package source if not already installed" do
-            subject.run_action(:unregister)
-            expect(subject).not_to be_updated_by_last_action
-        end
+      it "does not unregister the package source if not already installed" do
+        subject.run_action(:unregister)
+        expect(subject).not_to be_updated_by_last_action
+      end
     end
   end
 
