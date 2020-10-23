@@ -40,7 +40,7 @@ module WindowsCertificateHelper
 
   def no_of_certificates
     path = "Cert:\\LocalMachine\\" + store
-    # Seems weird that we have to call sir twice right?
+    # Seems weird that we have to call dir twice right?
     # The powershell cert provider seems to cache the last dir
     # in the same shell. By issuing dir with a different arg (-Force)
     # that seems to refresh things.
