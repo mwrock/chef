@@ -20,7 +20,6 @@
 #
 
 require_relative "../resource"
-require_relative "../json_compat"
 require_relative "../util/path_helper"
 
 class Chef
@@ -123,7 +122,7 @@ class Chef
         # this command selects individual objects because EncryptData & CachingMode have underlying
         # types that get converted to their Integer values by ConvertTo-Json & we need to make sure
         # those get written out as strings
-        share_state_cmd = "Get-SmbShare -Name '#{desired.share_name}' | Select-Object Name,Path, Description, Temporary, CATimeout, ContinuouslyAvailable, ConcurrentUserLimit, EncryptData | ConvertTo-Json -Compress"
+        share_state_cmd = "Get-SmbShare -Name '#{desired.share_name}' | Select-Object Name,Path, Description, Temporary, CATimeout, ContinuouslyAvailable, ConcurrentUserLimit, EncryptData"
 
         Chef::Log.debug("Running '#{share_state_cmd}' to determine share state'")
         ps_results = powershell_exec(share_state_cmd)
@@ -135,7 +134,7 @@ class Chef
         end
 
         Chef::Log.debug("The Get-SmbShare results were #{ps_results.result}")
-        results = Chef::JSONCompat.from_json(ps_results.result)
+        results = ps_results.result
 
         path results["Path"]
         description results["Description"]
@@ -147,7 +146,7 @@ class Chef
         encrypt_data results["EncryptData"]
         # folder_enumeration_mode results['FolderEnumerationMode']
 
-        perm_state_cmd = %{Get-SmbShareAccess -Name "#{desired.share_name}" | Select-Object AccountName,AccessControlType,AccessRight | ConvertTo-Json -Compress}
+        perm_state_cmd = %{Get-SmbShareAccess -Name "#{desired.share_name}" | Select-Object AccountName,AccessControlType,AccessRight}
 
         Chef::Log.debug("Running '#{perm_state_cmd}' to determine share permissions state'")
         ps_perm_results = powershell_exec(perm_state_cmd)
@@ -167,8 +166,7 @@ class Chef
 
       # given the string output of Get-SmbShareAccess parse out
       # arrays of full access users, change users, and read only users
-      def parse_permissions(results_string)
-        json_results = Chef::JSONCompat.from_json(results_string)
+      def parse_permissions(json_results)
         json_results = [json_results] unless json_results.is_a?(Array) # single result is not an array
 
         f_users = []

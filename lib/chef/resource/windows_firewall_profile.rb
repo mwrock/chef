@@ -87,7 +87,7 @@ class Chef
         if output.result.empty?
           current_value_does_not_exist!
         else
-          state = Chef::JSONCompat.from_json(output.result)
+          state = output.result
         end
 
         default_inbound_action state["default_inbound_action"]
@@ -166,12 +166,7 @@ class Chef
                 return $true
             } else {return $false}
           CODE
-          firewall_status = powershell_exec(cmd).result
-          if /True/.match?(firewall_status)
-            true
-          elsif /False/.match?(firewall_status)
-            false
-          end
+          powershell_exec!(cmd).result
         end
       end
 
@@ -193,7 +188,7 @@ class Chef
             allow_user_ports = $#{profile_name}.AllowUserPorts.ToString()
             allow_unicast_response = $#{profile_name}.AllowUnicastResponseToMulticast.ToString()
             display_notification = $#{profile_name}.NotifyOnListen.ToString()
-          }) | ConvertTo-Json
+          })
         EOH
       end
     end

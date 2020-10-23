@@ -19,8 +19,6 @@
 # limitations under the License.
 #
 
-require_relative "../json_compat"
-
 class Chef
   class Resource
     class WindowsFirewallRule < Chef::Resource
@@ -163,7 +161,7 @@ class Chef
         if output.result.empty?
           current_value_does_not_exist!
         else
-          state = Chef::JSONCompat.from_json(output.result)
+          state = output.result
         end
 
         # Need to reverse `$rule.Profile.ToString()` in powershell command
@@ -320,7 +318,7 @@ class Chef
             service = $serviceFilter.Service
             interface_type = $interfaceTypeFilter.InterfaceType.ToString()
             enabled = [bool]::Parse($rule.Enabled.ToString())
-          }) | ConvertTo-Json
+          })
         EOH
       end
     end
