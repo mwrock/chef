@@ -110,7 +110,7 @@ class Chef
         CODE
         output = powershell_exec(powershell_code)
         current_value_does_not_exist! if output.result.empty?
-        state =output.result
+        state = output.result
 
         if desired.secoption == "ResetLockoutCount" || desired.secoption == "LockoutDuration"
           if state["LockoutBadCount"] == "0"
