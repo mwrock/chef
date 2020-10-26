@@ -93,7 +93,6 @@ describe Chef::Resource::PowershellPackageSource, :windows_only do
   end
 
   def get_installed_package_source_name
-    # binding.pry
     powershell_exec!("(Get-PackageSource -Name #{source_name} -ErrorAction SilentlyContinue).Name").result
   end
 
