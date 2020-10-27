@@ -24,7 +24,7 @@ describe Chef::Resource::WindowsShare, :windows_only do
   let(:share_name) { "fake_share" }
   let(:path) { ENV["temp"] }
   let(:concurrent_user_limit) { 7 }
-  let(:full_users) { ["BUILTIN\\Administrators"] }
+  let(:full_users) { ["#{ENV["USERDOMAIN"]}\\#{ENV["USERNAME"]}"] }
 
   let(:run_context) do
     node = Chef::Node.new
@@ -66,11 +66,11 @@ describe Chef::Resource::WindowsShare, :windows_only do
     it "updates the share if it changed" do
       subject.run_action(:create)
       subject.concurrent_user_limit 8
-      subject.full_users ["#{ENV['USERDOMAIN']}\\#{ENV['USERNAME']}"]
+      subject.full_users ["BUILTIN\\Administrators"]
       subject.run_action(:create)
       share = get_installed_share
       expect(share["ConcurrentUserLimit"]).to eq(8)
-      expect(get_installed_share_access["AccountName"]).to eq("#{ENV['USERDOMAIN']}\\#{ENV['USERNAME']}")
+      expect(get_installed_share_access["AccountName"]).to eq("BUILTIN\\Administrators")
     end
   
   end
