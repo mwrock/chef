@@ -62,7 +62,7 @@ describe Chef::Resource::WindowsShare, :windows_only do
       subject.run_action(:create)
       expect(subject).not_to be_updated_by_last_action
     end
-  
+
     it "updates the share if it changed" do
       subject.run_action(:create)
       subject.concurrent_user_limit 8
@@ -72,7 +72,7 @@ describe Chef::Resource::WindowsShare, :windows_only do
       expect(share["ConcurrentUserLimit"]).to eq(8)
       expect(get_installed_share_access["AccountName"]).to eq("BUILTIN\\Administrators")
     end
-  
+
   end
 
   context "delete a share" do
