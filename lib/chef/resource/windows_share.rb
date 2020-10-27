@@ -280,6 +280,8 @@ class Chef
             if current_resource.nil?
               []
             else # if it exists then calculate the current to new resource diffs
+              puts "current: #{current_resource.full_users}"
+              puts "new: #{new_resource.full_users}"
               (current_resource.full_users + current_resource.change_users + current_resource.read_users) - (new_resource.full_users + new_resource.change_users + new_resource.read_users)
             end
           end
