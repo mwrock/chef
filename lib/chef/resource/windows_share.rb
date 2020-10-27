@@ -248,7 +248,9 @@ class Chef
         end
 
         def update_share
-          update_command = "Set-SmbShare -Name '#{new_resource.share_name}' -Description '#{new_resource.description}' -Force"
+          update_command = "Set-SmbShare -Name '#{new_resource.share_name}' -Description '#{new_resource.description}'  -ConcurrentUserLimit #{new_resource.concurrent_user_limit} -CATimeout #{new_resource.ca_timeout} -EncryptData:#{bool_string(new_resource.encrypt_data)} -ContinuouslyAvailable:#{bool_string(new_resource.continuously_available)} -Force"
+          update_command << " -ScopeName #{new_resource.scope_name}" unless new_resource.scope_name == "*" # passing * causes the command to fail
+          update_command << " -Temporary:#{bool_string(new_resource.temporary)}" if new_resource.temporary # only set true
 
           Chef::Log.debug("Running '#{update_command}' to update the share")
           powershell_exec!(update_command)

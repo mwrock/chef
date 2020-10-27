@@ -58,10 +58,10 @@ describe Chef::Resource::WindowsFirewallRule, :windows_only do
     end
 
     it "updates the rule if it changed" do
-        subject.run_action(:create)
-        subject.remote_port = "7777"
-        subject.run_action(:create)
-        expect(get_installed_rule_remote_port).to eq("7777")
+      subject.run_action(:create)
+      subject.remote_port = "7777"
+      subject.run_action(:create)
+      expect(get_installed_rule_remote_port).to eq("7777")
     end
   end
 
